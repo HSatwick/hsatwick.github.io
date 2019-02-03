@@ -116,6 +116,7 @@ var AppComponent = /** @class */ (function () {
     };
     AppComponent.prototype.handleCodeResult = function (resultString) {
         console.log("Result: ", resultString);
+        alert(resultString);
         this.barcodeResultString = resultString;
     };
     AppComponent.prototype.onDeviceSelectChange = function (selectedValue) {
