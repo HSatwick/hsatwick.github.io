@@ -74,7 +74,7 @@ module.exports = ".small-video {\r\n    -o-object-fit: contain;\r\n       object
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<!--The content below is only a placeholder and can be replaced.-->\n\n<div *ngIf=\"availableDevices\">\n  <select (change)=\"onDeviceSelectChange($event.target.value)\">\n    <option value=\"\" [selected]=\"!selectedDevice\">No Device</option>\n    <option *ngFor=\"let device of availableDevices\" [value]=\"device.deviceId\" [selected]=\"selectedDevice && device.deviceId === selectedDevice.deviceId\">{{ device.label }}</option>\n  </select>\n</div>\n\n\n<div [hidden]=\"!hasCameras\">\n    <h2 *ngIf=\"!this.selectedDevice\">No camera selected.</h2>\n    <p>\n        Result:\n        <strong>{{ barcodeResultString }}</strong>\n    </p>\n    <p>Angular version: {{ ngVersion }}</p>\n\n    <zxing-scanner #scanner class=\"test-class\" start=\"true\" [device]=\"selectedDevice\" \n    (scanSuccess)=\"handleCodeResult($event)\"\n    cssClass=\"small-video\" style=\"width: 50vw; height: 50vh;\"></zxing-scanner>\n\n</div>\n\n<div *ngIf=\"!hasCameras && hasPermission === true\">\n\n    <h1>Looks like your actual device does not have cameras, or I could no find'em. </h1>\n\n</div>\n\n<div *ngIf=\"hasPermission === undefined\">\n\n    <h1>Waiting for permissions.</h1>\n\n    <blockquote>\n        <h2>If your device does not has cameras, no permissions will be asked.</h2>\n    </blockquote>\n\n</div>\n\n<div *ngIf=\"hasPermission === false\">\n\n    <h1>You denied the camera permissions, we can't scan anything without it. 😪</h1>\n\n</div>\n\n<router-outlet></router-outlet>\n"
+module.exports = "<!--The content below is only a placeholder and can be replaced.-->\n\n<div *ngIf=\"availableDevices\">\n  <select (change)=\"onDeviceSelectChange($event.target.value)\">\n    <option value=\"\" [selected]=\"!selectedDevice\">No Device</option>\n    <option *ngFor=\"let device of availableDevices\" [value]=\"device.deviceId\" [selected]=\"selectedDevice && device.deviceId === selectedDevice.deviceId\">{{ device.label }}</option>\n  </select>\n</div>\n\n\n<div [hidden]=\"!hasCameras\">\n    <h2 *ngIf=\"!this.selectedDevice\">No camera selected.</h2>\n    <p>\n        Result:\n        <strong>{{ barcodeResultString }}</strong>\n    </p>\n    <p>Angular version: {{ ngVersion }}</p>\n\n    <zxing-scanner #scanner class=\"test-class\" start=\"true\" [device]=\"selectedDevice\" \n    (scanSuccess)=\"handleCodeResult($event)\"\n    [formats]=\"['QR_CODE', 'EAN_13', 'CODE_128', 'DATA_MATRIX']\"\n    cssClass=\"small-video\" style=\"width: 50vw; height: 50vh;\"></zxing-scanner>\n\n</div>\n\n<div *ngIf=\"!hasCameras && hasPermission === true\">\n\n    <h1>Looks like your actual device does not have cameras, or I could no find'em. </h1>\n\n</div>\n\n<div *ngIf=\"hasPermission === undefined\">\n\n    <h1>Waiting for permissions.</h1>\n\n    <blockquote>\n        <h2>If your device does not has cameras, no permissions will be asked.</h2>\n    </blockquote>\n\n</div>\n\n<div *ngIf=\"hasPermission === false\">\n\n    <h1>You denied the camera permissions, we can't scan anything without it. 😪</h1>\n\n</div>\n\n<router-outlet></router-outlet>\n"
 
 /***/ }),
 
@@ -104,14 +104,16 @@ var AppComponent = /** @class */ (function () {
         var _this = this;
         this.scanner.camerasFound.subscribe(function (devices) {
             _this.hasCameras = true;
-            console.log('Devices: ', devices);
             _this.availableDevices = devices;
         });
         this.scanner.camerasNotFound.subscribe(function (devices) {
             console.error("An error has occurred when trying to enumerate your video-stream-enabled devices.");
+            _this.hasCameras = false;
         });
         this.scanner.permissionResponse.subscribe(function (answer) {
             _this.hasPermission = answer;
+        });
+        this.scanner.scanComplete.subscribe(function (result) {
         });
     };
     AppComponent.prototype.handleCodeResult = function (resultString) {
